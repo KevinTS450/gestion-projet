@@ -18,14 +18,16 @@ class usersManageService
 {
 
     protected $utils;
+    protected $authService;
 
-    public function __construct(utils $utils)
+    public function __construct(utils $utils, AuthService $authService)
     {
         $this->utils = $utils;
+        $this->authService = $authService;
     }
 
 
-    public function createUser(array $data, $files)
+    public function  createUser(array $data, $files)
     {
 
         if (isset($data['password'])) {
@@ -191,14 +193,16 @@ class usersManageService
         }
     }
 
-    public function ListUsers($currentPage, $pageSize, $showDesactivate = 0, $search = '')
+    public function ListUsers($currentPage, $pageSize, $showDesactivate = false, $search = '')
     {
 
         $users = DB::table('users as u')
             ->leftJoin('gp_users_roles as roles', 'roles.user_id', '=', 'u.id')
             ->leftJoin('gp_users_roles_settings as rs', 'rs.id', '=', 'roles.id_settings')
             ->when($showDesactivate == 1, function ($query) {
-                $query->where('u.etat', '=', 1);
+                $query->whereIn('u.etat', [-1, 0]);
+            }, function ($query) {
+                $query->where('u.etat', 0);
             })
             ->when($showDesactivate == 0, function ($query) {
                 $query->where('u.etat', '=', 0);
@@ -211,8 +215,10 @@ class usersManageService
                 'u.name',
                 'u.gender',
                 'u.date_naissance',
+                'u.id',
                 'rs.key',
-                'rs.value'
+                'rs.value',
+                'rs.id as role_id'
             )
             ->paginate($pageSize, ['*'], 'page', $currentPage);
 
@@ -222,6 +228,7 @@ class usersManageService
             if (!isset($formattedUsers[$userInfo->email])) {
                 $formattedUsers[$userInfo->email] = [
                     'email' => $userInfo->email,
+                    'id' => $userInfo->id,
                     'name' => $userInfo->name,
                     'gender' => $userInfo->gender,
                     'date_naissance' => $userInfo->date_naissance,
@@ -232,7 +239,8 @@ class usersManageService
             if ($userInfo->key && $userInfo->value) {
                 $formattedUsers[$userInfo->email]['roles'][] = [
                     'key' => $userInfo->key,
-                    'value' => $userInfo->value
+                    'value' => $userInfo->value,
+                    'id' => $userInfo->role_id
                 ];
             }
         }
@@ -245,5 +253,14 @@ class usersManageService
             'per_page' => $users->perPage(),
             'total' => $users->total(),
         ];
+    }
+
+    public function showProfile($id_users)
+    {
+
+        $user = User::where('id', $id_users)
+                      ->first();
+        $userWithInfo = $this->authService->showUsers($user);
+        return $userWithInfo;
     }
 }

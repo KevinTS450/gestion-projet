@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGpUsersInfoSupTable extends Migration
+class CreateGpUsersInfoSups extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateGpUsersInfoSupTable extends Migration
      */
     public function up()
     {
-        Schema::create('gp_users_info_sup', function (Blueprint $table) {
+        Schema::create('gp_users_info_sups', function (Blueprint $table) {
           
             $table->id();
             $table->timestamps();
@@ -35,6 +35,6 @@ class CreateGpUsersInfoSupTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gp_users_info_sup');
+        Schema::dropIfExists('gp_users_info_sups');
     }
 }

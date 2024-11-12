@@ -12,7 +12,10 @@ class gp_users_roles_settings extends Model
 
 
  public static function getRoles () {
-    return gp_users_roles_settings::get();
+    return gp_users_roles_settings::
+      where('key' ,'!=' ,'ROLE_ADMIN')
+      ->select('value' ,'id')
+    ->get();
  }
 
 }

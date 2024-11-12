@@ -78,31 +78,42 @@ class AuthService
 
         $user = JWTAuth::parseToken()->authenticate();
 
-        $userWithInfo = User::with(['userInfo'])
-            ->leftJoin('gp_users_roles', 'gp_users_roles.user_id', '=', 'users.id')
-            ->leftJoin('gp_users_roles_settings', 'gp_users_roles_settings.id', '=', 'gp_users_roles.id_settings')
-            ->where('users.id', $user->id)
-            ->select(
-                'gp_users_roles_settings.value as role_value',
-                'gp_users_roles_settings.key as role_key',
-                'users.*'
-            )
-            ->first();
-
-        if ($userWithInfo) {
-            $userWithInfo = [
-                'users' => $user,
-                'roles' => [
-
-                    'key' => $userWithInfo->role_key,
-                    'value' => $userWithInfo->role_value
-
-                ],
-                'attachement' => $userWithInfo->userInfo
-            ];
-        }
+        $userWithInfo =$this->showUsers($user);
 
         return $userWithInfo;
+    }
+
+    public function showUsers($user) {
+
+        $userWithInfo = User::with(['userInfo'])
+        ->leftJoin('gp_users_roles', 'gp_users_roles.user_id', '=', 'users.id')
+        ->leftJoin('gp_users_roles_settings', 'gp_users_roles_settings.id', '=', 'gp_users_roles.id_settings')
+        ->where('users.id', $user->id)
+        ->select(
+            'gp_users_roles_settings.value as role_value',
+            'gp_users_roles_settings.key as role_key',
+            'users.*'
+        )
+        ->get(); 
+    
+    Log::info("user info => " . json_encode($userWithInfo));
+    
+    if ($userWithInfo->isNotEmpty()) {
+        $userFormatted = [
+            'users' => $user,
+            'roles' => $userWithInfo->map(function ($role) {
+                return [
+                    'key' => $role->role_key,
+                    'value' => $role->role_value,
+                ];
+            }),
+            'attachement' => $userWithInfo->first()->userInfo, 
+        ];
+        return $userFormatted;
+
+    }
+    
+
     }
 
 

@@ -144,10 +144,24 @@ class userManageController extends Controller
     
   }
 
-  public function ListUser () {
+  public function ListUser (Request $request) {
 
-    $data = $this->userManageService->ListUsers(1 ,10);
+    $pageSize = $request->input('pageSize', 5);
+    $currentPage = $request->input('page', 1);
+    $showDesactivate = $request->input('showDesactivate') ? 1 : 0;
+    $search = $request->input('search');
+    $data = $this->userManageService->ListUsers($currentPage ,$pageSize ,$showDesactivate , $search);
     return response()->json(['data' => $data]);
+  }
+
+  public function showProfile(Request $request) {
+    $id_users = $request->query('id_users');
+
+    $profile = $this->userManageService->showProfile($id_users);
+    return response()->json(['data' => $profile]);
+
+    
+
   }
 
   
