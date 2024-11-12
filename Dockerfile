@@ -1,24 +1,28 @@
-FROM php:7.4-fpm
+FROM php:7.4.4
 
-# Set the working directory to a Linux-style path
-WORKDIR /var/www
-
-# Install dependencies
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql
-
-# Copy project files into the container
-COPY . .
+# Install system dependencies and PHP extensions
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    git \
+    unzip \
+    && docker-php-ext-install pdo pdo_pgsql \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install PHP dependencies
-RUN composer install
+# Set working directory
+WORKDIR C:/fianarana/RappelReact(GESTION PROJET)/gestion-projet
 
-# Expose the port
-EXPOSE 9000
+# Copy application code (including artisan file)
+COPY . .
 
-# Start the PHP FastCGI Process Manager
-CMD ["php-fpm"]
+
+# Install composer dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Expose port
+EXPOSE 8000
+
+# Start the Laravel development server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnToGpProject extends Migration
+class CreateGpUsersRolesSettings extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,11 @@ class AddColumnToGpProject extends Migration
      */
     public function up()
     {
-        Schema::table('gp_project', function (Blueprint $table) {
-            $table->boolean('is_active');
+        Schema::create('gp_users_roles_settings', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('key');
+            $table->string('value');
         });
     }
 
@@ -25,8 +28,6 @@ class AddColumnToGpProject extends Migration
      */
     public function down()
     {
-        Schema::table('gp_project', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('gp_users_roles_settings');
     }
 }

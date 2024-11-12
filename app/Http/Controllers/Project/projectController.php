@@ -78,11 +78,5 @@ class projectController extends Controller
         return response()->json(['data' => $project]);
     }
 
-    public function assignRoles(Request $request)
-    {
-        $id_users = $request->id_users;
-        $roles = $request->roles;
-
-        $this->rolesService->assignRoles($id_users, $roles);
-    }
+   
 }

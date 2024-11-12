@@ -14,7 +14,7 @@ class AddColumnToGpUsersRoles extends Migration
     public function up()
     {
         Schema::table('gp_users_roles', function (Blueprint $table) {
-            $table->foreign('id_settings')->references('id')->on('gp_users_roles_setting');
+            $table->foreign('id_settings')->references('id')->on('gp_users_roles_settings');
 
         });
     }

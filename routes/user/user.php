@@ -14,6 +14,7 @@ Route::prefix('users')->group(function () {
     Route::get('/showDocs', [userManageController::class, 'showDocs']);
     Route::delete('/deleteDocs', [userManageController::class, 'deleteDocs']);
     Route::get('/ListUsers', [userManageController::class, 'ListUser']);
+    Route::get('/showProfile', [userManageController::class, 'showProfile']);
 
     Route::get('/', [authController::class, 'getUsers']);
 });

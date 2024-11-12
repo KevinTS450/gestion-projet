@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Service\RoleService;
 use App\Service\utils\response;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log;
 class roleController extends Controller
 
 {
@@ -31,5 +31,27 @@ class roleController extends Controller
         ];
        
         return $this->responseService->sendResponse('data', $res);
+    }
+
+    public function assignRoles(Request $request)
+    {
+        Log::info('all request =>' .json_encode($request->all()));
+        $id_users = $request->id_users;
+        $roles = $request->id_roles_setting;
+        $state = $request->state;
+
+        $this->roleService->assignRoles($id_users, $roles ,$state);
+    }
+
+
+    public function getRolesOfUsers (Request $request) {
+    
+        $id_users = $request->query('id_users');
+
+        $roles = $this->roleService->getRolesOf($id_users);
+
+        return response()->json(['data' => $roles]);
+
+
     }
 }
